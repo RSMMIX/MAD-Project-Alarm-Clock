@@ -41,6 +41,7 @@
 #include "DFPLAYER_MINI.h"
 #include "ds3231_for_stm32_hal.h"
 #include "string.h"
+#include "math.h"
 //#include "dfr0299.h"
 /* USER CODE END Includes */
 
@@ -141,9 +142,15 @@ uint16_t CRC16_2(uint8_t * , uint8_t);
 uint32_t ADC_read[2];
 extern ADC_HandleTypeDef hadc1;
 
+uint16_t old_min = -1;
+
+uint8_t starPos[25][2] = {{0, 0}};
+
 void showSetTime();
 void showSetAlarm();
 void setPage();
+void ILI9341_Draw_Star(uint16_t X, uint16_t Y, uint16_t Size, uint16_t Color);
+void ILI9341_Draw_Line(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t Color);
 
 /* USER CODE END PM */
 
@@ -391,6 +398,7 @@ int main(void)
 //	DS3231_SetAlarm1Hour(19);
      ILI9341_Draw_Rectangle(0,0, 320,200,  WHITE);
 
+
      //generateAndSortRandomNumbers(randomNumbers, 4);
    //  DS3231_SetFullDate(30,5, 4, 2002);
    while (1)
@@ -456,6 +464,11 @@ int main(void)
 				updateT();
 				bgcolor = mapColorByHourAndMinute(hur,min);
 				fontcolor = complementaryColor(bgcolor);
+
+				if (old_min != min){
+					old_min = min;
+					ILI9341_Fill_Screen(bgcolor);
+				}
 
 				showT();
 				starttime = count;
@@ -683,9 +696,11 @@ void alarm(){
 	//-----------------------------------
 	generateAndSortRandomNumbers(randomNumbers,4);
 	char pinNumber[4][2];
+	uint16_t btnColor[4] = {YELLOW , RED , GREEN , BLUE};
 //	snprintf(buttonInput, 15, "%d %d %d %d",randomNumbers[0],randomNumbers[1],randomNumbers[2],randomNumbers[3]);
 	for(int i=0;i<4;i++){
 		sprintf(pinNumber[i], "%d", randomNumbers[i]);
+		ILI9341_Draw_Filled_Circle(pinNumber[i], 0 + i*30, 5, btnColor[i]);
 		ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, BLACK, 4, WHITE);
 	}
 	DF_SetVolume(30);
@@ -802,7 +817,7 @@ void alarm(){
 //	ILI9341_Draw_Text(strS, 210,90, BLACK, 5, WHITE);
 
 	uint32_t dow_x = 56 + (9 - strlen(day[dow])) * 12;
-	ILI9341_Draw_Text(day[dow], dow_x,10 , fontcolor, 4, bgcolor);
+	ILI9341_Draw_Text(day[dow], dow_x, 10 , fontcolor, 4, bgcolor);
 	ILI9341_Draw_Text(strsensor, 75,40 , fontcolor, 2, bgcolor);
  //	ILI9341_Draw_Text(strsensor, 80,40 , BLACK, 1, WHITE);
 //	ILI9341_Draw_Text(strdate, 50,210, BLACK, 2, WHITE);
@@ -933,24 +948,34 @@ void showSetAlarm(){
 }
 
 
-void songSelectpage(){
 
-	ILI9341_Draw_Text("Song Number : ", 40,110, BLACK, 2, WHITE);
+void songSelectpage(){
+	for(int i=0;i<25;i++){
+		ILI9341_Draw_Rectangle(starPos[i][0]-6, starPos[i][1]-6, 12, 12, BLACK);
+	}
+	for(int i =0;i<25;i++){
+		uint32_t x = 30+ HAL_RNG_GetRandomNumber(&hrng) % 200;
+		uint32_t y = 20+HAL_RNG_GetRandomNumber(&hrng) % 210;
+		ILI9341_Draw_Star(x, y, 5, 0xfde0);
+		starPos[i][0] = x;
+		starPos[i][1] = y;
+	}
+	ILI9341_Draw_Text("Song Number : ", 40,110, WHITE, 2,BLACK );
 
 	char getname[20] = "";
 	sprintf(getname,"%d",songList);
 	HAL_UART_Transmit(&huart3, getname, strlen(getname), 1000);
 	if(previous_songlist != songList){
-		ILI9341_Draw_Filled_Rectangle_Coord(200,105, 240,130, WHITE);
-		ILI9341_Draw_Filled_Rectangle_Coord(40,140, 300,160, WHITE);
+		ILI9341_Draw_Filled_Rectangle_Coord(200,105, 240,130, BLACK);
+		ILI9341_Draw_Filled_Rectangle_Coord(40,140, 300,160, BLACK);
 		previous_songlist = songList;
 	}
-	ILI9341_Draw_Text(getname, 200,105, BLACK, 3, WHITE);
+	ILI9341_Draw_Text(getname, 200,105, WHITE, 3, BLACK);
 
 	uint16_t song_x = 70 + (16-strlen(songs[songList-1]))*5;
 	sprintf(getname,"%s",songs[songList-1]);
 
-	ILI9341_Draw_Text(getname, song_x,140, BLACK, 2, WHITE);
+	ILI9341_Draw_Text(getname, song_x,140, WHITE, 2, BLACK);
 //	ILI9341_Draw_Filled_Circle(X, Y, Radius, Colour)
 
 }
@@ -1169,8 +1194,15 @@ void setPage(){
 
    else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET && count - debounceTime > 200 ){
 	   debounceTime = count;
-	   ILI9341_Fill_Screen(WHITE);
+
 	   clicktime = count;
+	   ILI9341_Fill_Screen(WHITE);
+
+
+	   if(screen == 4){
+		   ILI9341_Fill_Screen(bgcolor);
+	   }
+
 
 	   while (count - clicktime < 1000){
 		   char message[50];
@@ -1185,6 +1217,9 @@ void setPage(){
 	   else {
 		   enterStateFlag = 0;
 		   screen++;
+		   if (screen == 4){
+			   ILI9341_Fill_Screen(BLACK);
+		   }
 		   if (screen > 4){
 			   DF_Pause();
 			   screen = 1;
@@ -1301,6 +1336,54 @@ uint16_t complementaryColor(uint16_t color) {
     // คำนวณสี RGB565 จา�?สีที่ตัด�?ัน
     return ((Rcomplementary << 11) | (Gcomplementary << 5) | Bcomplementary);
 }
+
+void ILI9341_Draw_Star(uint16_t X, uint16_t Y, uint16_t Size, uint16_t Color) {
+    // วาดเส้นแรก
+    int i;
+    for (i = 0; i < 5; i++) {
+        int x1 = X + (int)(Size * cos(2 * M_PI * i / 5));
+        int y1 = Y + (int)(Size * sin(2 * M_PI * i / 5));
+        int x2 = X + (int)(Size * cos(2 * M_PI * (i + 2) / 5));
+        int y2 = Y + (int)(Size * sin(2 * M_PI * (i + 2) / 5));
+        ILI9341_Draw_Line(x1, y1, x2, y2, Color);
+
+    }
+
+    // วาดเส้นที่ตัดกัน
+    for (i = 0; i < 5; i++) {
+        int x1 = X + (int)(Size * cos(2 * M_PI * i / 5));
+        int y1 = Y + (int)(Size * sin(2 * M_PI * i / 5));
+        int x2 = X + (int)(Size * cos(2 * M_PI * (i + 1) / 5));
+        int y2 = Y + (int)(Size * sin(2 * M_PI * (i + 1) / 5));
+        ILI9341_Draw_Line(x1, y1, x2, y2, Color);
+    }
+}
+
+void ILI9341_Draw_Line(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t Color) {
+    int dx = abs(x2 - x1);
+    int sx = x1 < x2 ? 1 : -1;
+    int dy = -abs(y2 - y1);
+    int sy = y1 < y2 ? 1 : -1;
+    int err = dx + dy;
+
+    while (1) {
+        ILI9341_Draw_Pixel(x1, y1, Color);
+        if (x1 == x2 && y1 == y2) {
+            break;
+        }
+        int e2 = 2 * err;
+        if (e2 >= dy) {
+            err += dy;
+            x1 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+}
+
+
 
 
 int dayofweek(int d, int m, int y)
