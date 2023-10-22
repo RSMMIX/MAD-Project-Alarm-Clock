@@ -700,8 +700,8 @@ void alarm(){
 //	snprintf(buttonInput, 15, "%d %d %d %d",randomNumbers[0],randomNumbers[1],randomNumbers[2],randomNumbers[3]);
 	for(int i=0;i<4;i++){
 		sprintf(pinNumber[i], "%d", randomNumbers[i]);
-		ILI9341_Draw_Filled_Circle(pinNumber[i], 0 + i*30, 5, btnColor[i]);
-		ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, BLACK, 4, WHITE);
+		ILI9341_Draw_Filled_Circle(60 + i*50,110, 20, btnColor[i]);
+		ILI9341_Draw_Text(pinNumber[i], 50 + i*50,100, BLACK, 4, btnColor[i]);
 	}
 	DF_SetVolume(30);
 	DF_SetFolder(1, songList);
@@ -742,7 +742,7 @@ void alarm(){
 				generateAndSortRandomNumbers(randomNumbers,4);
 				for(int i=0;i<4;i++){
 					sprintf(pinNumber[i], "%d", randomNumbers[i]);
-					ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, BLACK, 4, WHITE);
+					ILI9341_Draw_Text(pinNumber[i], 50 + i*50,100, BLACK, 4, btnColor[i]);
 					userButtonInput[i] = 0;
 				}
 //				snprintf(buttonInput, 15, "%d %d %d %d",randomNumbers[0],randomNumbers[1],randomNumbers[2],randomNumbers[3]);
