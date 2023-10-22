@@ -8,6 +8,7 @@
 
 #include "stm32f7xx_hal.h"
 #include "stdio.h"
+//#include "main.c"
 
 extern UART_HandleTypeDef huart6;
 #define DF_UART &huart6
@@ -25,6 +26,10 @@ extern UART_HandleTypeDef huart6;
 
 int ispause =0;
 int isplaying=1;
+
+extern uint16_t songList;
+extern RNG_HandleTypeDef hrng;
+uint16_t savedSong = 0, pre_num = 0;
 
 
 # define Start_Byte 0x7E
@@ -128,13 +133,114 @@ void Check_Key (void)
 }
 
 
+void selectSong (void)
+{
+	if (!HAL_GPIO_ReadPin(Pause_Port, Pause_Key))
+	{
+		HAL_Delay(50);
+		if (!HAL_GPIO_ReadPin(Pause_Port, Pause_Key)){
+			DF_SetFolder(1, songList);
+			savedSong = songList;
+		}
+	}
+
+	if (!HAL_GPIO_ReadPin(Previous_Port, Previous_Key))
+	{
+		HAL_Delay(50);
+		if (!HAL_GPIO_ReadPin(Previous_Port, Previous_Key));
+		songList--;
+		//DF_Previous();
+	}
+
+	if (!HAL_GPIO_ReadPin(Next_Port, Next_Key))
+	{
+		HAL_Delay(50);
+		if (!HAL_GPIO_ReadPin(Next_Port, Next_Key));
+		songList++;
+		//DF_Next();
+	}
+
+	if(songList < 1)
+		songList = 10;
+	else if(songList > 10)
+		songList = 1;
+}
 
 
 
 
 
+void DF_SetFolder(uint8_t fol ,uint8_t num)
+{
+  Send_cmd(0x0F, fol, num);
+  HAL_Delay(200);
+}
 
 
+void MusicController (uint32_t val)
+{
+
+
+	uint32_t value = val*30/4095;
+
+	DF_SetVolume(value);
+
+	if (!HAL_GPIO_ReadPin(Pause_Port, Pause_Key))
+	{
+		while (!HAL_GPIO_ReadPin(Pause_Port, Pause_Key));
+		if (isplaying)
+		{
+			ispause = 1;
+			isplaying = 0;
+			DF_Pause();
+		}
+
+		else if (ispause)
+		{
+			isplaying = 1;
+			ispause = 0;
+			DF_Playback();
+		}
+	}
+
+	if (!HAL_GPIO_ReadPin(Previous_Port, Previous_Key))
+	{
+		while (!HAL_GPIO_ReadPin(Previous_Port, Previous_Key)){
+			uint16_t num = HAL_RNG_GetRandomNumber(&hrng) % 8 + 1;
+			while(pre_num == num){
+				num = HAL_RNG_GetRandomNumber(&hrng) % 8 + 1;
+			}
+			pre_num = num;
+			DF_SetFolder(2, num);
+		}
+
+//		DF_SetFolder(1,4);
+	}
+
+	if (!HAL_GPIO_ReadPin(Next_Port, Next_Key))
+	{
+		while (!HAL_GPIO_ReadPin(Next_Port, Next_Key));
+		//DF_SetFolder();
+	}
+}
+
+void DF_loop(uint8_t file)
+{
+  Send_cmd(0x08,0x00, file);
+  HAL_Delay(200);
+}
+
+void DF_repeat(void)
+{
+  Send_cmd(0x11,0x00, 0x01);
+  HAL_Delay(200);
+}
+
+void DF_openFolder(uint8_t vol)
+{
+  Send_cmd(0x17,0x00, vol);
+  HAL_Delay(200);
+}
 
 
 

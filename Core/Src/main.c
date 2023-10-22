@@ -19,6 +19,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "rng.h"
 #include "spi.h"
@@ -108,7 +110,7 @@ char strsensor[50] ="";
 
 char timeString[50];
 
-//ปิดปลุก
+//ปิดปลุ�?
 uint32_t randomNumbers[4];
 HAL_StatusTypeDef randomStatus;
 uint32_t userButtonInput[4] = {0};
@@ -126,7 +128,18 @@ int enterStateFlag = 0;
 
 uint32_t debounceTimeSave = 0;
 
+
+uint16_t bgcolor = 0;
+uint16_t fontcolor = 0;
+
+uint16_t songList = 1, previous_songlist = 1;
+extern uint16_t savedSong;
+char *songs[20] = {"Ae Ae", "Radar", "Attack on Titan", "Minion", "Kimetsu no Yaiba", "Night Dancer", "Clock Song", "IceTim Wall Song", "Wake Up Thailand", "Bangrajan"};
+
 uint16_t CRC16_2(uint8_t * , uint8_t);
+
+uint32_t ADC_read[2];
+extern ADC_HandleTypeDef hadc1;
 
 void showSetTime();
 void showSetAlarm();
@@ -192,17 +205,29 @@ int compareArrays(int array1[], int array2[], int size) {
 }
 
 void letTheMusicLouderThanAnySound(float dt){
-	float dutyCycle = dt;
-	htim2.Instance -> CCR4 = (10000-1) * (dutyCycle);
-	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
-	pwm = (GPIOA->IDR & GPIO_PIN_3) >> 3;
+
+
+	float dutycycle = dt;
+	    htim2.Instance -> CCR3 = (24-1) * dutycycle;
+	    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+	    HAL_Delay(1000);
+	    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_4);
+	    pwm = (GPIOA->IDR & GPIO_PIN_3) >> 3;
 }
 
-void stopTheMusic(){
-	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_4);
-	HAL_GPIO_WritePin(GPIOC, 8, GPIO_PIN_RESET);
-	dutyCycle = 0;
+void pabfai(int dt){
+
+
+		float duty = (float)dt/100.0;
+	    htim5.Instance -> CCR3 = (1000-1) * duty;
+	    HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
+//	    HAL_Delay(1000);
+//	    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_);
+	    pwm = (GPIOA->IDR & GPIO_PIN_0) >> 9;
+
 }
+
+
 /*void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim == &htim2) {
         timer_ticks++;
@@ -296,10 +321,9 @@ int main(void)
 
   /* USER CODE END SysInit */
 
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART3_UART_Init();
+  MX_DMA_Init();
   MX_SPI5_Init();
   MX_TIM1_Init();
   MX_RNG_Init();
@@ -308,11 +332,30 @@ int main(void)
   MX_I2C1_Init();
   MX_USART6_UART_Init();
   MX_TIM3_Init();
+  MX_USART3_UART_Init();
+  MX_ADC1_Init();
+  MX_TIM5_Init();
+  MX_TIM9_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   ILI9341_Init();//initial driver setup to drive ili9341
-  HAL_TIM_Base_Start_IT(&htim2);
+  //HAL_TIM_Base_Start_IT(&htim2);
+  HAL_TIM_Base_Start_IT(&htim1);
   HAL_TIM_Base_Start_IT(&htim3);
+
+  HAL_TIM_PWM_Init(&htim5);
+
+  HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
+
+
+  //HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+
   HAL_UART_Init(&huart3);
+
+  uint16_t mapColorByHourAndMinute(uint16_t hour, uint16_t minute);
+  uint16_t complementaryColor(uint16_t color);
+
+
 
   DF_Init(30);
 	DF_PlayFromStart();
@@ -355,6 +398,31 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//	   float dutycycle = 1.0;
+//	   	    htim2.Instance -> CCR3 = (24-1) * dutycycle;
+//	   	    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+//	   	    HAL_Delay(1000);
+//	   	    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_4);
+//	   	    pwm = (GPIOA->IDR & GPIO_PIN_3) >> 3;
+
+	  // letTheMusicLouderThanAnySound(0.7);
+
+
+	   HAL_ADC_Start_DMA(&hadc1, ADC_read, 2);
+	   char message[20];
+	   sprintf(message, "%d %d\r\n", ADC_read[0],ADC_read[1]);
+	   HAL_UART_Transmit(&huart3, (uint8_t *)message, sizeof(message), HAL_MAX_DELAY);
+
+
+
+
+	   int TFT_level = ADC_read[1]*100/4095;
+	   char message2[20];
+	   sprintf(message2, "TFT %d\r\n",TFT_level);
+	  	   HAL_UART_Transmit(&huart3, (uint8_t *)message2, sizeof(message2), HAL_MAX_DELAY);
+
+
+	   pabfai(TFT_level);
 
 	   // Debug time Tera term
 	   if ( count - teratermTime > 3000){
@@ -380,8 +448,15 @@ int main(void)
 	   switch(screen){
 	   case 1: // First state : show time
 		   // Update screen every second
+
+		   MusicController(ADC_read[0]);
+
+
 		   if((count-starttime) > 1000){
 				updateT();
+				bgcolor = mapColorByHourAndMinute(hur,min);
+				fontcolor = complementaryColor(bgcolor);
+
 				showT();
 				starttime = count;
 			}
@@ -465,7 +540,10 @@ int main(void)
 		   break;
 
 	   case 4:
-		   Check_Key();
+//		   Check_Key();
+		   if(songList != savedSong){
+			   DF_Pause();
+		   }
 		   setPage();
 		   break;
 
@@ -598,6 +676,10 @@ void updateSensor() {
 void alarm(){
 	//-----------------------------------
 	ILI9341_Draw_Text("WAKE UP!!", 50,50, BLACK, 4, WHITE);
+
+
+
+
 	//-----------------------------------
 	generateAndSortRandomNumbers(randomNumbers,4);
 	char pinNumber[4][2];
@@ -606,25 +688,32 @@ void alarm(){
 		sprintf(pinNumber[i], "%d", randomNumbers[i]);
 		ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, BLACK, 4, WHITE);
 	}
+	DF_SetVolume(30);
+	DF_SetFolder(1, songList);
 //	ILI9341_Draw_Text(buttonInput, 50,100, BLACK, 4, WHITE);
 	int cnt = 0;
 	while(1){
+		if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_10) == GPIO_PIN_SET){
+			DF_SetVolume(30);
+			DF_SetFolder(1, songList);
+		}
 		if(cnt != 4){
 			if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET){
 				userButtonInput[cnt++] = 1;
-				HAL_Delay(1000);
+				letTheMusicLouderThanAnySound(0.1);
+
 			}
 			else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13) == GPIO_PIN_RESET){
 				userButtonInput[cnt++] = 2;
-				HAL_Delay(1000);
+				letTheMusicLouderThanAnySound(0.4);
 			}
 			else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET){
 				userButtonInput[cnt++] = 3;
-				HAL_Delay(1000);
+				letTheMusicLouderThanAnySound(0.6);
 			}
 			else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET){
 				userButtonInput[cnt++] = 4;
-				HAL_Delay(1000);
+				letTheMusicLouderThanAnySound(0.1);
 			}
 		}
 		else{
@@ -648,8 +737,15 @@ void alarm(){
 		}
 		for(int i=0;i<4;i++){
 			ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, (userButtonInput[i] == randomNumbers[i]) ? GREEN : ((userButtonInput[i] == 0) ? BLACK : RED), 4, WHITE);
+//			if(userButtonInput[i] == randomNumbers[i]){
+//				letTheMusicLouderThanAnySound(0.7);
+//			}
+//			else{
+//				letTheMusicLouderThanAnySound(0.2);
+//			}
 		}
 	}
+	DF_Pause();
 }
 
  void updateT(){
@@ -700,14 +796,14 @@ void alarm(){
  	snprintf(timedate,50,"%d %s %d",date+1, months[month], year);
 
 	snprintf(timeString, 50, "%s:%s:%s", strH, strM, strS);
-	ILI9341_Draw_Text(timeString, 42, 100, BLACK, 5, WHITE);
+	ILI9341_Draw_Text(timeString, 42, 100, fontcolor, 5, bgcolor);
 //	ILI9341_Draw_Text(strH, 50,90, BLACK, 5, WHITE);
 //	ILI9341_Draw_Text(strM, 120,90, BLACK, 5, WHITE);
 //	ILI9341_Draw_Text(strS, 210,90, BLACK, 5, WHITE);
 
 	uint32_t dow_x = 56 + (9 - strlen(day[dow])) * 12;
-	ILI9341_Draw_Text(day[dow], dow_x,10 , BLACK, 4, WHITE);
-	ILI9341_Draw_Text(strsensor, 75,40 , BLACK, 2, WHITE);
+	ILI9341_Draw_Text(day[dow], dow_x,10 , fontcolor, 4, bgcolor);
+	ILI9341_Draw_Text(strsensor, 75,40 , fontcolor, 2, bgcolor);
  //	ILI9341_Draw_Text(strsensor, 80,40 , BLACK, 1, WHITE);
 //	ILI9341_Draw_Text(strdate, 50,210, BLACK, 2, WHITE);
 //	ILI9341_Draw_Text(months[month], 80,210, BLACK, 2, WHITE);
@@ -715,11 +811,11 @@ void alarm(){
 	uint32_t time_x = 50 + (9-((setMonth == 99) ? strlen(months[month]) : strlen(months[setMonth]))) * 7;
 //	if (month % 2 == 1)
 //		x -= 5;
- 	ILI9341_Draw_Text(timedate, time_x, 210, BLACK, 2, WHITE);
+ 	ILI9341_Draw_Text(timedate, time_x, 210, fontcolor, 2, bgcolor);
 //	ILI9341_Draw_Text(timedate, 50, 210, BLACK, 2, WHITE);
 	char willBeAlarmIn[50] = "";
 	snprintf(willBeAlarmIn, 50, "Alarm at %02d:%02d", setAlarmHour, setAlarmMin);
-	ILI9341_Draw_Text(willBeAlarmIn, 75, 140, BLACK, 2, WHITE);
+	ILI9341_Draw_Text(willBeAlarmIn, 75, 140, fontcolor, 2, bgcolor);
 
  }
 
@@ -836,15 +932,46 @@ void showSetAlarm(){
 //	ILI9341_Draw_Text(day[dow], 10, 200 , BLACK, 4, WHITE);
 }
 
+
+void songSelectpage(){
+
+	ILI9341_Draw_Text("Song Number : ", 40,110, BLACK, 2, WHITE);
+
+	char getname[20] = "";
+	sprintf(getname,"%d",songList);
+	HAL_UART_Transmit(&huart3, getname, strlen(getname), 1000);
+	if(previous_songlist != songList){
+		ILI9341_Draw_Filled_Rectangle_Coord(200,105, 240,130, WHITE);
+		ILI9341_Draw_Filled_Rectangle_Coord(40,140, 300,160, WHITE);
+		previous_songlist = songList;
+	}
+	ILI9341_Draw_Text(getname, 200,105, BLACK, 3, WHITE);
+
+	uint16_t song_x = 70 + (16-strlen(songs[songList-1]))*5;
+	sprintf(getname,"%s",songs[songList-1]);
+
+	ILI9341_Draw_Text(getname, song_x,140, BLACK, 2, WHITE);
+//	ILI9341_Draw_Filled_Circle(X, Y, Radius, Colour)
+
+}
+
 void setPage(){
 	if((count-starttime) > 1000){
 		if(screen == 2)
 			showSetTime();
 		else if(screen == 3)
 			showSetAlarm();
+
+		else if(screen == 4){
+			songSelectpage();
+			selectSong();
+//			HAL_UART_Transmit(&huart3, songList,  , Timeout);
+		}
+
 		starttime = count;
 	}
-//   Check_Key();
+
+
 
 
    if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET && count - debounceTime > 1000){
@@ -878,9 +1005,9 @@ void setPage(){
 	   case 2:
 		   if(screen == 2) {setYear++;}
 		   else if(screen == 3){
-		   			   setAlarmHour++;
-		   			   setAlarmHour %=24;
-		   		   }
+			   setAlarmHour++;
+			   setAlarmHour %=24;
+		   }
 
 		   break;
 	   case 3:
@@ -1058,8 +1185,10 @@ void setPage(){
 	   else {
 		   enterStateFlag = 0;
 		   screen++;
-		   if (screen > 4)
+		   if (screen > 4){
+			   DF_Pause();
 			   screen = 1;
+		   }
 	   }
 
 //	   	   while(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET)
@@ -1091,6 +1220,86 @@ void setPage(){
 //		   setSec = param3;
 //	   }
    }
+}
+
+
+// ฟัง�?์ชันตัวผสมสี
+uint16_t RGB565(uint16_t R, uint16_t G, uint16_t B) {
+    float Rr = (R * 255) / (float)100;
+    float Gg = (G * 255) / (float)100;
+    float Bb = (B * 255) / (float)100;
+
+    // ปรับค่าสี R, G, B ให้อยู่ในช่วง 0-255
+    uint8_t R8 = (uint8_t)(Rr + 0.5);  // �?ปลงค่าทศนิยมเป็นจำนวนเต็ม
+    uint8_t G8 = (uint8_t)(Gg + 0.5);
+    uint8_t B8 = (uint8_t)(Bb + 0.5);
+
+    // ทำ�?ารลดขนาดค่าสี R, G, B เข้าให้เป็นช่วง 0-31
+    uint8_t R5 = (R8 * 31) / 255;
+    uint8_t G6 = (G8 * 63) / 255;
+    uint8_t B5 = (B8 * 31) / 255;
+
+    // คำนวณค่า RGB565
+    uint16_t RGB565 = ((R5 << 11) | (G6 << 5) | B5);
+
+    return RGB565;
+}
+
+uint16_t mapColorByHourAndMinute(uint16_t hour, uint16_t minute) {
+    // คำนวณสีที่จะไล่ตามชั่วโมง�?ละนาที
+    int R, G, B;
+
+    if (hour >= 0 && hour < 6) {
+        // 0.00-6.00: น้ำเงินเข้ม
+        R = 0;
+        G = 0;
+        B = 50;
+    } else if (hour >= 6 && hour < 12) {
+        // 6.00-12.00: สีเหลืองเริ่มที่ความสวยของสีเขียวเพิ่มขึ้น
+        int intensity = ((hour - 6) * 100) / 6;
+        R = 100;
+        G = 100;
+        B = intensity;
+    } else if (hour >= 12 && hour < 18) {
+        // 12.00-18.00: สีส้มเริ่มลดสีเขียว
+        int intensity = ((hour - 12) * 100) / 6;
+        R = 100;
+        G = 100 - intensity;
+        B = 0;
+    } else if (hour >= 18 && hour < 24) {
+        // 18.00-24.00: สีเขียวเริ่มเพิ่มสีเขียว
+        int intensity = ((hour - 18) * 100) / 6;
+        R = intensity;
+        G = 100;
+        B = 0;
+    } else {
+        // ไม่ถู�?ต้อง
+        R = 0;
+        G = 0;
+        B = 0;
+    }
+
+    // �?�?้ไขสีตามนาที
+    // เพิ่มความสวยของสีด้วย�?ารเปลี่ยน G (เขียว) ตามนาที
+    G = (G * minute) / 60;
+
+    return RGB565(R, G, B);
+}
+
+// ฟัง�?์ชันเพื่อคำนวณสีตรงข้าม (complementary color)
+uint16_t complementaryColor(uint16_t color) {
+    // สลับค่า R (�?ดง), G (เขียว), �?ละ B (น้ำเงิน)
+    uint8_t R5 = (color >> 11) & 0x1F;
+    uint8_t G6 = (color >> 5) & 0x3F;
+    uint8_t B5 = color & 0x1F;
+
+    // คำนวณสีที่ตัด�?ัน
+    uint8_t Rcomplementary = 31 - R5;  // ตัด�?ัน�?ละสลับค่า�?ดง
+    uint8_t Gcomplementary = 63 - G6;  // ตัด�?ัน�?ละสลับค่าเขียว
+    uint8_t Bcomplementary = 31 - B5;  // ตัด�?ัน�?ละสลับค่าน้ำเงิน
+
+    // คำนวณสี RGB565 จา�?สีที่ตัด�?ัน
+    return ((Rcomplementary << 11) | (Gcomplementary << 5) | Bcomplementary);
 }
 
 
