@@ -696,11 +696,11 @@ void alarm(){
 	//-----------------------------------
 	generateAndSortRandomNumbers(randomNumbers,4);
 	char pinNumber[4][2];
-	uint16_t btnColor[4] = {YELLOW , RED , GREEN , BLUE};
+	uint16_t btnColor[4] = {0x2455 , 0x2455 , 0x2455 , 0x2455};
 //	snprintf(buttonInput, 15, "%d %d %d %d",randomNumbers[0],randomNumbers[1],randomNumbers[2],randomNumbers[3]);
 	for(int i=0;i<4;i++){
 		sprintf(pinNumber[i], "%d", randomNumbers[i]);
-		ILI9341_Draw_Filled_Circle(60 + i*50,110, 20, btnColor[i]);
+		ILI9341_Draw_Filled_Circle(55 + i*50,120, 20, btnColor[i]);
 		ILI9341_Draw_Text(pinNumber[i], 50 + i*50,100, BLACK, 4, btnColor[i]);
 	}
 	DF_SetVolume(30);
@@ -751,7 +751,7 @@ void alarm(){
 			}
 		}
 		for(int i=0;i<4;i++){
-			ILI9341_Draw_Text(pinNumber[i], 50 + i*30,100, (userButtonInput[i] == randomNumbers[i]) ? GREEN : ((userButtonInput[i] == 0) ? BLACK : RED), 4, WHITE);
+			ILI9341_Draw_Text(pinNumber[i], 50 + i*50,100, (userButtonInput[i] == randomNumbers[i]) ? GREEN : ((userButtonInput[i] == 0) ? BLACK : RED), 4, btnColor[i]);
 //			if(userButtonInput[i] == randomNumbers[i]){
 //				letTheMusicLouderThanAnySound(0.7);
 //			}
@@ -1107,8 +1107,8 @@ void setPage(){
 		   else if(screen == 3){
 			   if(setAlarmMin > 0){
 					   setAlarmMin--;
-					   ILI9341_Draw_Rectangle(90,175, 125,30,  WHITE);
-						   }
+					 //  ILI9341_Draw_Rectangle(90,175, 125,30,  WHITE);
+				}
 		   }
 		   break;
 
@@ -1121,10 +1121,13 @@ void setPage(){
 	   		   }
 
 	   		else if(screen == 3){
+
 			   if(setAlarmDay > 0){
 					   setAlarmDay--;
-						   }
-			   ILI9341_Draw_Rectangle(60,200, 200,40,  WHITE);
+					   ILI9341_Draw_Rectangle( 70,175, 200,40,  WHITE);
+			}
+
+			   //ILI9341_Draw_Rectangle(60,200, 200,40,  WHITE);
 //			   ILI9341_Draw_Rectangle(90,200, 125,40,  RED);
 		   }
 
@@ -1132,7 +1135,7 @@ void setPage(){
 
 	   }
    }
-   else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET && count - debounceTime > 100){
+   else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET  && count - debounceTime > 100){
 	   debounceTime = count;
 //	   if(selectionMode){
 
@@ -1142,7 +1145,7 @@ void setPage(){
 		   // update setting Time
 
 
-		   if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET && count - debounceTimeSave > 3000){
+		   if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_12) == GPIO_PIN_RESET  && count - debounceTimeSave > 3000){ // && count - debounceTimeSave > 3000
 
 
 			   if(screen == 2){
@@ -1165,6 +1168,8 @@ void setPage(){
 
 
 			   HAL_UART_Transmit(&huart3, (uint8_t *)"SAVED!!", sizeof("SAVED!!"), HAL_MAX_DELAY);
+
+			   HAL_Delay(50);
 		   }
 		   else{
 
@@ -1186,6 +1191,7 @@ void setPage(){
 //					   currentIndex = 2;
 //				   }
 			   }
+			   HAL_Delay(50);
 		   }
 
 //

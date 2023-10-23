@@ -6309,32 +6309,32 @@ LOAD E:/Micro/STM32CubeIDE_1.13.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.
  .text.updateSensor
                 0x0000000008002048      0x108 ./Core/Src/main.o
                 0x0000000008002048                updateSensor
- .text.alarm    0x0000000008002150      0x2f4 ./Core/Src/main.o
+ .text.alarm    0x0000000008002150      0x304 ./Core/Src/main.o
                 0x0000000008002150                alarm
- .text.updateT  0x0000000008002444       0x80 ./Core/Src/main.o
-                0x0000000008002444                updateT
- .text.showT    0x00000000080024c4      0x240 ./Core/Src/main.o
-                0x00000000080024c4                showT
+ .text.updateT  0x0000000008002454       0x80 ./Core/Src/main.o
+                0x0000000008002454                updateT
+ .text.showT    0x00000000080024d4      0x240 ./Core/Src/main.o
+                0x00000000080024d4                showT
  .text.showSetTime
-                0x0000000008002704      0x240 ./Core/Src/main.o
-                0x0000000008002704                showSetTime
+                0x0000000008002714      0x240 ./Core/Src/main.o
+                0x0000000008002714                showSetTime
  .text.showSetAlarm
-                0x0000000008002944      0x188 ./Core/Src/main.o
-                0x0000000008002944                showSetAlarm
+                0x0000000008002954      0x188 ./Core/Src/main.o
+                0x0000000008002954                showSetAlarm
  .text.songSelectpage
-                0x0000000008002acc      0x1e0 ./Core/Src/main.o
-                0x0000000008002acc                songSelectpage
- .text.setPage  0x0000000008002cac      0x734 ./Core/Src/main.o
-                0x0000000008002cac                setPage
- .text.RGB565   0x00000000080033e0      0x134 ./Core/Src/main.o
-                0x00000000080033e0                RGB565
+                0x0000000008002adc      0x1e0 ./Core/Src/main.o
+                0x0000000008002adc                songSelectpage
+ .text.setPage  0x0000000008002cbc      0x728 ./Core/Src/main.o
+                0x0000000008002cbc                setPage
+ .text.RGB565   0x00000000080033e4      0x134 ./Core/Src/main.o
+                0x00000000080033e4                RGB565
  .text.mapColorByHourAndMinute
-                0x0000000008003514      0x100 ./Core/Src/main.o
-                0x0000000008003514                mapColorByHourAndMinute
+                0x0000000008003518      0x100 ./Core/Src/main.o
+                0x0000000008003518                mapColorByHourAndMinute
  .text.complementaryColor
-                0x0000000008003614       0x6e ./Core/Src/main.o
-                0x0000000008003614                complementaryColor
- *fill*         0x0000000008003682        0x6 
+                0x0000000008003618       0x6e ./Core/Src/main.o
+                0x0000000008003618                complementaryColor
+ *fill*         0x0000000008003686        0x2 
  .text.ILI9341_Draw_Star
                 0x0000000008003688      0x2b0 ./Core/Src/main.o
                 0x0000000008003688                ILI9341_Draw_Star
@@ -8148,42 +8148,42 @@ LOAD E:/Micro/STM32CubeIDE_1.13.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.
  .debug_macro   0x000000000002c58d      0x21b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
  .debug_macro   0x000000000002c7a8      0x238 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
 
-.debug_line     0x0000000000000000    0x2306e
+.debug_line     0x0000000000000000    0x23060
  .debug_line    0x0000000000000000      0xbea ./Core/Src/DFPLAYER_MINI.o
  .debug_line    0x0000000000000bea      0x8ac ./Core/Src/adc.o
  .debug_line    0x0000000000001496      0x7f2 ./Core/Src/dma.o
  .debug_line    0x0000000000001c88      0xe45 ./Core/Src/ds3231_for_stm32_hal.o
  .debug_line    0x0000000000002acd      0x8a1 ./Core/Src/gpio.o
  .debug_line    0x000000000000336e      0x916 ./Core/Src/i2c.o
- .debug_line    0x0000000000003c84     0x1af7 ./Core/Src/main.o
- .debug_line    0x000000000000577b      0x846 ./Core/Src/rng.o
- .debug_line    0x0000000000005fc1      0x86f ./Core/Src/spi.o
- .debug_line    0x0000000000006830      0x7f7 ./Core/Src/stm32f7xx_hal_msp.o
- .debug_line    0x0000000000007027      0x85a ./Core/Src/stm32f7xx_it.o
- .debug_line    0x0000000000007881      0x8b7 ./Core/Src/syscalls.o
- .debug_line    0x0000000000008138      0x588 ./Core/Src/sysmem.o
- .debug_line    0x00000000000086c0      0x897 ./Core/Src/system_stm32f7xx.o
- .debug_line    0x0000000000008f57      0xb95 ./Core/Src/tim.o
- .debug_line    0x0000000000009aec      0x8f5 ./Core/Src/usart.o
- .debug_line    0x000000000000a3e1       0x78 ./Core/Startup/startup_stm32f767zitx.o
- .debug_line    0x000000000000a459      0xc48 ./Drivers/ILI9341/ILI9341_GFX.o
- .debug_line    0x000000000000b0a1      0xb7a ./Drivers/ILI9341/ILI9341_STM32_Driver.o
- .debug_line    0x000000000000bc1b      0xb36 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
- .debug_line    0x000000000000c751     0x1333 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.o
- .debug_line    0x000000000000da84      0xd8d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
- .debug_line    0x000000000000e811     0x1056 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
- .debug_line    0x000000000000f867      0xc7b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
- .debug_line    0x00000000000104e2     0x37de ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
- .debug_line    0x0000000000013cc0      0x932 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
- .debug_line    0x00000000000145f2      0xa0b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
- .debug_line    0x0000000000014ffd      0xa73 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
- .debug_line    0x0000000000015a70      0xf76 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
- .debug_line    0x00000000000169e6      0xf4d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
- .debug_line    0x0000000000017933      0xa6d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.o
- .debug_line    0x00000000000183a0     0x205d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
- .debug_line    0x000000000001a3fd     0x3d8c ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
- .debug_line    0x000000000001e189     0x1cee ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
- .debug_line    0x000000000001fe77     0x31f7 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
+ .debug_line    0x0000000000003c84     0x1ae9 ./Core/Src/main.o
+ .debug_line    0x000000000000576d      0x846 ./Core/Src/rng.o
+ .debug_line    0x0000000000005fb3      0x86f ./Core/Src/spi.o
+ .debug_line    0x0000000000006822      0x7f7 ./Core/Src/stm32f7xx_hal_msp.o
+ .debug_line    0x0000000000007019      0x85a ./Core/Src/stm32f7xx_it.o
+ .debug_line    0x0000000000007873      0x8b7 ./Core/Src/syscalls.o
+ .debug_line    0x000000000000812a      0x588 ./Core/Src/sysmem.o
+ .debug_line    0x00000000000086b2      0x897 ./Core/Src/system_stm32f7xx.o
+ .debug_line    0x0000000000008f49      0xb95 ./Core/Src/tim.o
+ .debug_line    0x0000000000009ade      0x8f5 ./Core/Src/usart.o
+ .debug_line    0x000000000000a3d3       0x78 ./Core/Startup/startup_stm32f767zitx.o
+ .debug_line    0x000000000000a44b      0xc48 ./Drivers/ILI9341/ILI9341_GFX.o
+ .debug_line    0x000000000000b093      0xb7a ./Drivers/ILI9341/ILI9341_STM32_Driver.o
+ .debug_line    0x000000000000bc0d      0xb36 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+ .debug_line    0x000000000000c743     0x1333 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_adc.o
+ .debug_line    0x000000000000da76      0xd8d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
+ .debug_line    0x000000000000e803     0x1056 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.o
+ .debug_line    0x000000000000f859      0xc7b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
+ .debug_line    0x00000000000104d4     0x37de ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
+ .debug_line    0x0000000000013cb2      0x932 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
+ .debug_line    0x00000000000145e4      0xa0b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
+ .debug_line    0x0000000000014fef      0xa73 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.o
+ .debug_line    0x0000000000015a62      0xf76 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
+ .debug_line    0x00000000000169d8      0xf4d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
+ .debug_line    0x0000000000017925      0xa6d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.o
+ .debug_line    0x0000000000018392     0x205d ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_spi.o
+ .debug_line    0x000000000001a3ef     0x3d8c ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
+ .debug_line    0x000000000001e17b     0x1cee ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
+ .debug_line    0x000000000001fe69     0x31f7 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
 
 .debug_str      0x0000000000000000   0x108a12
  .debug_str     0x0000000000000000    0xfe2fe ./Core/Src/DFPLAYER_MINI.o

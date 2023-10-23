@@ -16,10 +16,10 @@
 ../Core/Src/main.c:903:6:showSetAlarm	120	static
 ../Core/Src/main.c:952:6:songSelectpage	56	static
 ../Core/Src/main.c:983:6:setPage	80	static
-../Core/Src/main.c:1262:10:RGB565	48	static
-../Core/Src/main.c:1283:10:mapColorByHourAndMinute	40	static
-../Core/Src/main.c:1325:10:complementaryColor	24	static
-../Core/Src/main.c:1340:6:ILI9341_Draw_Star	80	static
-../Core/Src/main.c:1362:6:ILI9341_Draw_Line	48	static
-../Core/Src/main.c:1389:5:dayofweek	80	static
-../Core/Src/main.c:1405:6:Error_Handler	4	static
+../Core/Src/main.c:1268:10:RGB565	48	static
+../Core/Src/main.c:1289:10:mapColorByHourAndMinute	40	static
+../Core/Src/main.c:1331:10:complementaryColor	24	static
+../Core/Src/main.c:1346:6:ILI9341_Draw_Star	80	static
+../Core/Src/main.c:1368:6:ILI9341_Draw_Line	48	static
+../Core/Src/main.c:1395:5:dayofweek	80	static
+../Core/Src/main.c:1411:6:Error_Handler	4	static
